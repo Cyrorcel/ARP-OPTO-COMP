@@ -1,0 +1,27 @@
+name: Build VST3 (macOS)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release -j 4
+
+      - name: Package VST3
+        run: |
+          ditto -c -k --keepParent "$HOME/Library/Audio/Plug-Ins/VST3/ARP-Opto-comp.vst3" ARP-Opto-comp-VST3.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ARP-Opto-comp-VST3-macOS
+          path: ARP-Opto-comp-VST3.zip
